@@ -25,6 +25,12 @@ export function Providers({ children }: { children: ReactNode }) {
           classNames: {
             toast:
               "!bg-popover !text-popover-foreground !border-border !rounded-2xl !shadow-[var(--shadow-lg)] !font-sans",
+            title: "!text-popover-foreground !font-medium",
+            // Explicit colours so text stays readable in both themes.
+            description: "!text-muted-foreground",
+            actionButton: "!rounded-lg !bg-primary !text-primary-foreground !font-medium",
+            cancelButton:
+              "!rounded-lg !bg-secondary !text-secondary-foreground !font-medium",
           },
         }}
       />

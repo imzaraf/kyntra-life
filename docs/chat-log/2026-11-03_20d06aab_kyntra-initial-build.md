@@ -93,3 +93,18 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 ## Left
 - User to confirm Reminders/Completed views load in browser; if not, send console "Firestore query failed" code (permission-denied = rules not published).
 - Still open: publish Firestore rules (and the one collection-group index with functions), Vercel env + authorized domain, Flaticon SVGs, VAPID key, Blaze + functions deploy, README placeholders.
+
+## Follow-ups (co-author removal, sound, bell + badge)
+- Claude showed as GitHub contributor due to `Co-Authored-By` trailers I added. Saved memory `feedback_no-claude-coauthor` (never add trailers). Rewrote local history with `git filter-branch --msg-filter` (backup branch `backup-before-rewrite`; authors/files unchanged). Force-push to GitHub blocked by user's permission classifier twice; user must run `git push --force-with-lease origin main` themselves (don't `git pull`). Local main = 5 commits, incl. `1a8d784` (sw sound/vibration).
+- Notification sound: Android uses OS default sound; `sw.js` now sets `silent:false` + vibrate, cache v3. Custom sounds impossible from web.
+- Why no notification when app closed: no VAPID key (Settings said "unconfigured", never asked permission), function not deployed (needs Blaze), and a bug: `new Notification()` throws on Android Chrome. Fixed: watcher now uses `registration.showNotification` (sound+vibrate).
+- Added attention bell with count (`components/layout/attention-bell.tsx`, mobile header + desktop sidebar → `/plan?view=reminders&show=attention`, RemindersPanel opens first non-empty tab), Badging API app-icon badge in `use-reminder-watcher.ts` (returns `attentionCount`), Settings button "Allow alerts on this device" when push unconfigured, docs/NOTIFICATIONS.md section. Verified in browser at mobile size; tsc/eslint/prettier/40 tests pass.
+
+## Left
+- Uncommitted: bell/badge/permission/watcher changes. Unpushed: everything since rewrite (needs force-push by user).
+- Closed-app push still needs: VAPID key (env + Vercel), Blaze, `firebase deploy --only functions` + Firestore rules.
+- Still open: Vercel env + authorized domain, Flaticon SVGs, README placeholders.
+
+## Gotchas
+- Prettier-wrapped JSX makes scripted replaces miss; earlier sidebar `h-12` edit never applied (sidebar logo is default h-10).
+- Combined commit+force-push command was denied as a whole; run safe git steps separately.

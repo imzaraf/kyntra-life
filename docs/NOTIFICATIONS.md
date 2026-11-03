@@ -54,3 +54,9 @@ Scheduled functions need the Blaze (pay‑as‑you‑go) plan and a Google Cloud
 ## Limitations
 
 Delivery is **best‑effort**, not guaranteed: browser permission, OS focus/battery modes, network, and Firebase infrastructure all affect it. iOS requires the PWA to be added to the Home Screen. The push path was implemented and unit‑tested for its decision logic, but has **not** been verified against a real Firebase project in this repository's CI.
+
+## Bell, app badge and device alerts
+
+- The top bar shows a bell with the number of reminders that are due or past due; tapping it opens them (`/plan?view=reminders&show=attention`).
+- On installed PWAs the same number is set as the **app icon badge** via the Badging API (Android Chrome and desktop). It updates whenever the app runs; it does not update while the app is fully closed unless a push arrives.
+- Granting notification permission works even without cloud push configured: while the app is open or recently used, due reminders show as system notifications (sound + vibration, shown via the service worker because `new Notification()` is not allowed on Android Chrome). Alerts when the app is fully closed still require the cloud push setup above.

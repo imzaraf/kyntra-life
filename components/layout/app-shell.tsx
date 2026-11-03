@@ -13,6 +13,7 @@ import { useOnline } from "@/hooks/use-online";
 import { cn } from "@/lib/utils";
 import { AccountMenu } from "./account-menu";
 import { AppIcon } from "@/components/shared/app-icon";
+import { AttentionBell } from "./attention-bell";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { NAV_ITEMS } from "./nav-items";
 
@@ -22,6 +23,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const online = useOnline();
   const [captureOpen, setCaptureOpen] = useState(false);
+  const { attentionCount } = useReminderWatcher();
 
   useEffect(() => {
     if (status === "signed-out" || status === "misconfigured") router.replace("/sign-in");
@@ -42,11 +44,13 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[260px_1fr]">
-      <ReminderWatcher />
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-sidebar-border bg-sidebar/80 px-4 py-6 backdrop-blur md:flex">
-        <Link href="/today" className="mb-8 px-2" aria-label="Kyntra Life home">
-          <Logo />
-        </Link>
+        <div className="mb-8 flex items-center justify-between gap-2 px-2">
+          <Link href="/today" aria-label="Kyntra Life home">
+            <Logo />
+          </Link>
+          <AttentionBell count={attentionCount} />
+        </div>
 
         <Button
           onClick={() => setCaptureOpen(true)}
@@ -105,6 +109,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-background/85 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-[0_1px_0_rgb(255_255_255/0.5),0_6px_16px_-12px_rgb(41_45_42/0.35)] backdrop-blur-xl md:hidden dark:shadow-[0_6px_16px_-12px_rgb(0_0_0/0.7)]">
           <Logo variant="horizontal-tagline" className="h-12" />
           <div className="flex items-center gap-1">
+            <AttentionBell count={attentionCount} />
             <ThemeToggle />
             <AccountMenu compact />
           </div>
@@ -146,11 +151,6 @@ export function AppShell({ children }: { children: ReactNode }) {
       <QuickCapture open={captureOpen} onOpenChange={setCaptureOpen} />
     </div>
   );
-}
-
-function ReminderWatcher() {
-  useReminderWatcher();
-  return null;
 }
 
 function MobileTab({

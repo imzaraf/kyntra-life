@@ -45,13 +45,15 @@ import {
 
 export function RemindersPanel() {
   const now = useNow(15_000);
-  const highlight = useSearchParams().get("reminder");
+  const params = useSearchParams();
+  const highlight = params.get("reminder");
+  const wantsAttention = params.get("show") === "attention";
   const pending = usePendingReminders();
   const closed = useClosedReminders();
   const tasks = useOpenTasks();
   const actions = useReminderActions();
 
-  const [view, setView] = useState<ReminderView>("upcoming");
+  const [picked, setView] = useState<ReminderView | null>(null);
   const [editing, setEditing] = useState<Reminder | null>(null);
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<Reminder | null>(null);
@@ -60,8 +62,18 @@ export function RemindersPanel() {
     () => [...pending.data, ...closed.data],
     [pending.data, closed.data],
   );
-  const list = useMemo(() => filterReminders(all, view, now), [all, view, now]);
   const count = (v: ReminderView) => filterReminders(pending.data, v, now).length;
+  // Arriving from the bell ("show=attention") opens the first tab that has something in it.
+  const view: ReminderView =
+    picked ??
+    (wantsAttention
+      ? count("due") > 0
+        ? "due"
+        : count("past_due") > 0
+          ? "past_due"
+          : "upcoming"
+      : "upcoming");
+  const list = useMemo(() => filterReminders(all, view, now), [all, view, now]);
   const source = view === "completed" ? closed : pending;
 
   return (

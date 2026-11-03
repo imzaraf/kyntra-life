@@ -1,26 +1,59 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { useNow } from "@/hooks/use-now";
 import { buildDeepLink } from "@/lib/notifications/deep-link";
 import { dueReminders } from "./reminder-logic";
 import { usePendingReminders, useReminderActions } from "./use-reminders";
 
+/** Show a system notification via the service worker (required on Android: `new Notification()` throws). */
+async function showSystemNotification(
+  title: string,
+  body: string | undefined,
+  key: string,
+  url: string,
+) {
+  const registration = await navigator.serviceWorker?.ready;
+  if (!registration) return;
+  await registration.showNotification(title, {
+    body,
+    tag: `reminder-${key}`, // matches the server push, so the OS replaces rather than duplicates
+    icon: "/icons/icon-192.png",
+    badge: "/icons/icon-96.png",
+    silent: false,
+    vibrate: [200, 100, 200],
+    data: { url },
+  } as NotificationOptions);
+}
+
+/** Keep the installed app's launcher-icon badge in sync (Android Chrome / desktop PWAs). */
+function syncAppBadge(count: number) {
+  const nav = navigator as Navigator & {
+    setAppBadge?: (n?: number) => Promise<void>;
+    clearAppBadge?: () => Promise<void>;
+  };
+  if (count > 0) void nav.setAppBadge?.(count).catch(() => undefined);
+  else void nav.clearAppBadge?.().catch(() => undefined);
+}
+
 /**
- * Surfaces due reminders inside the app. It re-evaluates against the stored
- * schedule on mount, on a short interval, and on focus/visibility changes
- * (via useNow) — it never depends on a long-lived setTimeout.
- * This path works even when notification permission is denied.
+ * Surfaces due reminders inside the app and returns how many need attention
+ * (due or past due). It re-evaluates against the stored schedule on mount, on a short
+ * interval, and on focus/visibility changes (via useNow) — never a long-lived setTimeout.
+ * In-app alerts work even when notification permission is denied.
  */
-export function useReminderWatcher() {
+export function useReminderWatcher(): { attentionCount: number } {
   const now = useNow(15_000);
   const pending = usePendingReminders();
   const actions = useReminderActions();
   const alerted = useRef(new Set<string>());
 
+  const due = useMemo(() => dueReminders(pending.data, now), [pending.data, now]);
+  const attentionCount = due.length;
+
   useEffect(() => {
-    for (const r of dueReminders(pending.data, now)) {
+    for (const r of due) {
       const key = `${r.id}:${r.scheduledAt.getTime()}`;
       if (alerted.current.has(key)) continue;
       alerted.current.add(key);
@@ -34,13 +67,19 @@ export function useReminderWatcher() {
           cancel: { label: "Snooze 10m", onClick: () => void actions.snooze(r, "10m") },
         });
       } else if ("Notification" in window && Notification.permission === "granted") {
-        // `tag` matches the server push so the OS replaces rather than duplicates.
-        const n = new Notification(r.title, { body: r.note, tag: `reminder-${key}` });
-        n.onclick = () => {
-          window.focus();
-          window.location.assign(buildDeepLink({ type: "reminder", reminderId: r.id }));
-        };
+        void showSystemNotification(
+          r.title,
+          r.note,
+          key,
+          buildDeepLink({ type: "reminder", reminderId: r.id }),
+        ).catch((error) => console.error("Couldn't show notification", error));
       }
     }
-  }, [pending.data, now, actions]);
+  }, [due, actions]);
+
+  useEffect(() => {
+    syncAppBadge(attentionCount);
+  }, [attentionCount]);
+
+  return { attentionCount };
 }

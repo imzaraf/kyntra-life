@@ -17,13 +17,18 @@ export function NotificationSettings() {
   const { user } = useAuth();
   const [support, setSupport] = useState<PushSupport | null>(null);
   const [busy, setBusy] = useState(false);
+  const [localPerm, setLocalPerm] = useState<NotificationPermission | null>(null);
 
-  const refresh = useCallback(async () => setSupport(await getPushSupport()), []);
+  const refresh = useCallback(async () => {
+    setSupport(await getPushSupport());
+    setLocalPerm(typeof Notification === "undefined" ? null : Notification.permission);
+  }, []);
 
   useEffect(() => {
     void (async () => {
       const s = await getPushSupport();
       setSupport(s);
+      setLocalPerm(typeof Notification === "undefined" ? null : Notification.permission);
       // Keep this device's token fresh (tokens can rotate) when permission already exists.
       if (s.state === "granted" && user)
         await syncPushToken(user.uid).catch((e) => console.error("Token sync failed", e));
@@ -59,6 +64,16 @@ export function NotificationSettings() {
       setBusy(false);
       await refresh();
     }
+  };
+
+  const allowLocal = async () => {
+    const result = await Notification.requestPermission();
+    if (result === "granted") toast.success("Alerts allowed on this device");
+    else
+      toast.error(
+        "Notifications were not allowed. You can change this in your phone's app settings.",
+      );
+    await refresh();
   };
 
   return (
@@ -99,6 +114,33 @@ export function NotificationSettings() {
           </Button>
         )}
       </div>
+      {support?.state === "unconfigured" && (
+        <div className="rounded-2xl bg-sage-soft/60 p-4 text-sm">
+          <p className="font-medium">
+            {localPerm === "granted"
+              ? "Device alerts are allowed."
+              : localPerm === "denied"
+                ? "Device alerts are blocked."
+                : "Device alerts are off."}
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            With permission, reminders show as phone notifications (with sound) while the
+            app is open or recently used. Alerts when the app is fully closed need cloud
+            push, which isn&apos;t set up yet (see docs/NOTIFICATIONS.md).
+          </p>
+          {localPerm === "default" && (
+            <Button className="mt-3" size="sm" onClick={allowLocal}>
+              Allow alerts on this device
+            </Button>
+          )}
+          {localPerm === "denied" && (
+            <p className="mt-2 text-muted-foreground">
+              Open your phone&apos;s Settings → Apps → Kyntra Life → Notifications to
+              allow them.
+            </p>
+          )}
+        </div>
+      )}
       <p className="text-xs leading-relaxed text-muted-foreground">
         In-app reminders always work, even without permission. Push delivery depends on
         your browser, operating system, device settings, network and Firebase

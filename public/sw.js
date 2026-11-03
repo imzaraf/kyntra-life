@@ -9,7 +9,7 @@
  * Private data is never cached here: Firestore traffic is cross-origin and bypassed,
  * and HTML documents are not cached (only the static offline page).
  */
-const VERSION = "kyntra-v4";
+const VERSION = "kyntra-v5";
 const STATIC_CACHE = `${VERSION}-static`;
 const PRECACHE = [
   "/offline.html",
@@ -79,8 +79,10 @@ self.addEventListener("push", (event) => {
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
-      // If Kyntra is open and visible, the in-app reminder UI already handles it.
-      if (clients.some((c) => c.visibilityState === "visible")) return;
+      // Our own reminder pushes are skipped while Kyntra is visible: the in-app popup already
+      // handles them. Anything else (e.g. a console test message) is always shown.
+      const isReminder = typeof d.tag === "string" && d.tag.startsWith("reminder-");
+      if (isReminder && clients.some((c) => c.visibilityState === "visible")) return;
       return self.registration.showNotification(title, {
         body,
         tag: d.tag || undefined,

@@ -13,10 +13,29 @@ import {
   type PushSupport,
 } from "@/lib/notifications/fcm";
 
+/** Turn Firebase/Firestore push errors into something actionable (and keep the raw code visible). */
+function describePushError(error: unknown): string {
+  const code = (error as { code?: string })?.code ?? "";
+  const hint =
+    code === "permission-denied"
+      ? "Firestore rules rejected saving this device. Publish firestore.rules."
+      : code.includes("token-subscribe") || code.includes("token-unsubscribe")
+        ? "Google rejected the push registration. Check the Firebase Cloud Messaging API is enabled and that the API key isn't restricted."
+        : code.includes("failed-service-worker")
+          ? "The service worker couldn't start. Reinstall the app and try again."
+          : code.includes("permission-blocked")
+            ? "Notifications are blocked for this site in the browser."
+            : code.includes("unsupported")
+              ? "This browser doesn't support web push."
+              : "Check your Firebase push setup.";
+  return `Couldn't enable notifications${code ? ` (${code})` : ""}. ${hint}`;
+}
+
 export function NotificationSettings() {
   const { user } = useAuth();
   const [support, setSupport] = useState<PushSupport | null>(null);
   const [busy, setBusy] = useState(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [localPerm, setLocalPerm] = useState<NotificationPermission | null>(null);
 
   const refresh = useCallback(async () => {
@@ -31,13 +50,17 @@ export function NotificationSettings() {
       setLocalPerm(typeof Notification === "undefined" ? null : Notification.permission);
       // Keep this device's token fresh (tokens can rotate) when permission already exists.
       if (s.state === "granted" && user)
-        await syncPushToken(user.uid).catch((e) => console.error("Token sync failed", e));
+        await syncPushToken(user.uid).catch((e) => {
+          console.error("Token sync failed", e);
+          setSyncError(describePushError(e));
+        });
     })();
   }, [user]);
 
   const enable = async () => {
     if (!user) return;
     setBusy(true);
+    setSyncError(null);
     try {
       const result = await enablePush(user.uid);
       if (result === "granted") toast.success("Notifications enabled on this device");
@@ -46,8 +69,8 @@ export function NotificationSettings() {
           "Notifications were blocked. You can allow them in your browser's site settings.",
         );
     } catch (error) {
-      console.error(error);
-      toast.error("Couldn't enable notifications. Check your Firebase push setup.");
+      console.error("Enable notifications failed", error);
+      toast.error(describePushError(error), { duration: 12_000 });
     } finally {
       setBusy(false);
       await refresh();
@@ -114,6 +137,11 @@ export function NotificationSettings() {
           </Button>
         )}
       </div>
+      {syncError && (
+        <p role="alert" className="rounded-2xl bg-terracotta-soft p-3 text-sm">
+          {syncError}
+        </p>
+      )}
       {support?.state === "unconfigured" && (
         <div className="rounded-2xl bg-sage-soft/60 p-4 text-sm">
           <p className="font-medium">

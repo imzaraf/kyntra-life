@@ -121,3 +121,17 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 ## Gotchas
 - Backgrounded Android PWAs are frozen within seconds, so in-app/local alerts can't be relied on; only the server push works when closed.
 - Installed PWAs may cache the old build; reinstall after env/redeploy changes.
+
+## Follow-ups (push still silent: no token registered)
+- User still got no closed-app notification despite browser/app permissions allowed. Firestore screenshot of `users/{uid}` showed only `reminders` and `tasks` subcollections: **no `notificationTokens`** → the phone never saved an FCM token, so the function has nothing to send to (root cause for now; function deploy/Blaze status still unknown).
+- `public/sw.js` (v4, commit `2098cba`): push handler now parses defensively, accepts data-only (ours) and `notification` (Firebase console test message) payloads, always shows a notification unless a client is visible.
+- `features/settings/notification-settings.tsx` (commit `ccc954d`): `describePushError` maps FCM/Firestore error codes to hints (token-subscribe → enable FCM API/check API key restrictions; permission-denied → publish rules; SW registration; blocked; unsupported) and shows a persistent red message + longer toast instead of the vague one. Tests/tsc/eslint pass.
+- Gave test plan: Enable notifications on laptop Chrome, read the error code; then console "Send test message" with token; then check Functions list + reminder `delivery` field.
+
+## Left
+- Commits `2098cba` and `ccc954d` are local, NOT pushed (user must say "push it"); Vercel redeploy needed for them to reach the phone.
+- Need from user: the exact error text from Enable notifications; whether `deliverDueReminders` is deployed (Blaze); then `notificationTokens` doc appears.
+- Likely culprits to check: FCM API enabled in Google Cloud, API key restrictions, Firestore rules published, VAPID key in the deployed build.
+
+## Gotchas
+- The Firestore console only shows collections that have documents; an absent `notificationTokens` means no token was ever written.

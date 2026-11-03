@@ -148,3 +148,18 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 
 ## Gotchas
 - Multiple stacked reminder toasts appear when several reminders are due at once (each has its own toast); consider capping if noisy.
+
+## Follow-ups (push registration debugging, still unresolved)
+- Added Settings → "Troubleshooting push" panel (`features/settings/push-troubleshooting.tsx`, `push-errors.ts`, `collectPushDiagnostics` in `lib/notifications/fcm.ts`): ✓/✗ per link (VAPID in build, browser support, permission, SW, saved devices) + "Register this device". Verified rendering in scratch copy.
+- Root-cause finding: token registration only ran from the Settings page (mount when permission already granted, or the Enable button when permission "default"). User had pre-granted permission via the "Allow alerts" button, so neither path ran. Fix: `features/settings/use-push-token-sync.ts` (called in `AppShell`) registers/refreshes the device at app start when signed in and permission granted.
+- User still saw no `notificationTokens` locally and an empty console. Hook skipped silently; now logs `[push] …` via console.warn with the reason (permission is per-origin: localhost ≠ Vercel URL). Commits local: `8f169b9`, `cb17e74` (toast contrast), `d781201`, `2019d86`; none pushed.
+- User frustrated; told them plainly what I can/can't do: closed-app push also needs Blaze + deployed `deliverDueReminders` (their Google login/billing). Offered alternative: keep in-app popups + bell count as final behaviour.
+- In-app toasts work on time (confirmed by user screenshots); bell count shows.
+
+## Left
+- Awaiting user's choice: (a) enable Blaze + deploy functions and read the `[push]` console line / Troubleshooting panel, or (b) accept in-app-only alerts (then tidy docs/Settings copy).
+- Push local commits when user says so; still open: Flaticon SVGs, README placeholders, CI action bumps.
+
+## Gotchas
+- Silent early-returns hide root causes; always log why a step is skipped.
+- Notification permission is per origin; allowing on phone/Vercel doesn't allow localhost.

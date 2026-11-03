@@ -9,7 +9,7 @@
  * Private data is never cached here: Firestore traffic is cross-origin and bypassed,
  * and HTML documents are not cached (only the static offline page).
  */
-const VERSION = "kyntra-v5";
+const VERSION = "kyntra-v6";
 const STATIC_CACHE = `${VERSION}-static`;
 const PRECACHE = [
   "/offline.html",
@@ -83,6 +83,8 @@ self.addEventListener("push", (event) => {
       // handles them. Anything else (e.g. a console test message) is always shown.
       const isReminder = typeof d.tag === "string" && d.tag.startsWith("reminder-");
       if (isReminder && clients.some((c) => c.visibilityState === "visible")) return;
+      // Any live Kyntra page (e.g. backgrounded but not frozen) can play the chime.
+      clients.forEach((c) => c.postMessage({ type: "kyntra:chime" }));
       return self.registration.showNotification(title, {
         body,
         tag: d.tag || undefined,

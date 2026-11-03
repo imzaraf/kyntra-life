@@ -14,6 +14,7 @@ import {
 } from "@/lib/notifications/fcm";
 import { describePushError } from "./push-errors";
 import { PushTroubleshooting } from "./push-troubleshooting";
+import { SoundSetting } from "./sound-setting";
 
 export function NotificationSettings() {
   const { user } = useAuth();
@@ -153,6 +154,7 @@ export function NotificationSettings() {
           )}
         </div>
       )}
+      <SoundSetting />
       <PushTroubleshooting />
       <p className="text-xs leading-relaxed text-muted-foreground">
         In-app reminders always work, even without permission. Push delivery depends on

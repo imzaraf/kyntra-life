@@ -60,3 +60,8 @@ Delivery is **best‑effort**, not guaranteed: browser permission, OS focus/batt
 - The top bar shows a bell with the number of reminders that are due or past due; tapping it opens them (`/plan?view=reminders&show=attention`).
 - On installed PWAs the same number is set as the **app icon badge** via the Badging API (Android Chrome and desktop). It updates whenever the app runs; it does not update while the app is fully closed unless a push arrives.
 - Granting notification permission works even without cloud push configured: while the app is open or recently used, due reminders show as system notifications (sound + vibration, shown via the service worker because `new Notification()` is not allowed on Android Chrome). Alerts when the app is fully closed still require the cloud push setup above.
+
+## Sound
+
+- **System banners** (closed or backgrounded app) use the device's own notification sound. A web app can request it (`silent: false`, which Kyntra does) but cannot force or choose it; on macOS, enable _Play sound for notifications_ for Google Chrome in System Settings → Notifications.
+- **In-app chime** (`lib/notifications/chime.ts`): a soft two-note tone generated with Web Audio, played when a reminder popup appears and when the service worker relays a push to a live page (`kyntra:chime` message). Toggle and "Test sound" are in Settings. Browsers only allow audio after the user has interacted with the page once, so a page opened but never touched may stay silent.

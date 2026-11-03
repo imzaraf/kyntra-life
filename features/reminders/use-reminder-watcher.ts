@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { useNow } from "@/hooks/use-now";
+import { playChime } from "@/lib/notifications/chime";
 import { buildDeepLink } from "@/lib/notifications/deep-link";
 import { dueReminders } from "./reminder-logic";
 import { usePendingReminders, useReminderActions } from "./use-reminders";
@@ -59,6 +60,7 @@ export function useReminderWatcher(): { attentionCount: number } {
       alerted.current.add(key);
 
       if (document.visibilityState === "visible") {
+        void playChime();
         toast(r.title, {
           id: key,
           description: r.note || "Reminder",
@@ -80,6 +82,17 @@ export function useReminderWatcher(): { attentionCount: number } {
   useEffect(() => {
     syncAppBadge(attentionCount);
   }, [attentionCount]);
+
+  // The service worker asks any live Kyntra page to chime when a push arrives
+  // (a worker itself can't play audio).
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    const onMessage = (event: MessageEvent) => {
+      if (event.data?.type === "kyntra:chime") void playChime();
+    };
+    navigator.serviceWorker.addEventListener("message", onMessage);
+    return () => navigator.serviceWorker.removeEventListener("message", onMessage);
+  }, []);
 
   return { attentionCount };
 }

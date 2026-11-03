@@ -1,6 +1,6 @@
 "use client";
 
-import { orderBy, where } from "firebase/firestore";
+import { where } from "firebase/firestore";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/features/auth/auth-provider";
@@ -9,21 +9,37 @@ import { reminderRepo } from "@/lib/repositories";
 import type { Reminder } from "@/types/domain";
 import { localTimeZone, snoozeTime, type SnoozeOption } from "./reminder-logic";
 
+/**
+ * Single-field filters only (no orderBy), so no composite index is required for the
+ * app to work. Sorting happens here; personal-scale lists are small and bounded.
+ */
+function useSorted(
+  query: ReturnType<typeof useRepoQuery<Reminder>>,
+  direction: "asc" | "desc",
+) {
+  return useMemo(() => {
+    const sign = direction === "asc" ? 1 : -1;
+    const data = [...query.data].sort(
+      (a, b) => sign * (a.scheduledAt.getTime() - b.scheduledAt.getTime()),
+    );
+    return { ...query, data };
+  }, [query, direction]);
+}
+
 export const usePendingReminders = () =>
-  useRepoQuery(
-    reminderRepo,
-    () => [where("status", "==", "pending"), orderBy("scheduledAt", "asc")],
-    "pending",
+  useSorted(
+    useRepoQuery(reminderRepo, () => [where("status", "==", "pending")], "pending"),
+    "asc",
   );
 
 export const useClosedReminders = () =>
-  useRepoQuery(
-    reminderRepo,
-    () => [
-      where("status", "in", ["completed", "dismissed"]),
-      orderBy("scheduledAt", "desc"),
-    ],
-    "closed",
+  useSorted(
+    useRepoQuery(
+      reminderRepo,
+      () => [where("status", "in", ["completed", "dismissed"])],
+      "closed",
+    ),
+    "desc",
   );
 
 export interface ReminderInput {

@@ -33,7 +33,7 @@ users/{uid}/journalEntries|tasks|timeBlocks|reminders|routines|learningItems|
 
 - Dates: local calendar days are `yyyy-MM-dd` strings; instants (`scheduledAt`) are Firestore Timestamps with the user's IANA `timeZone` stored. Time blocks store minutes since local midnight (0–1440) and never cross midnight. Presets use local wall‑clock construction, so DST shifts don't break “tomorrow 9:00”.
 - Every document has `schemaVersion`, `createdAt`, `updatedAt` (server timestamps). Bump `SCHEMA_VERSION` and add a migration step when shapes change; backups carry their own `version`.
-- Queries are bounded (`limit(500)`), filtered by status/date where it matters (open vs completed tasks, one day of blocks, pending vs closed reminders), and composite indexes are declared in `firestore.indexes.json`.
+- Queries are bounded (`limit(500)`), filtered by status/date where it matters (open vs completed tasks, one day of blocks, pending vs closed reminders), and the app needs no composite indexes (lists are filtered by one field and sorted client-side); the only declared index is the collection-group one the reminder Cloud Function uses (`firestore.indexes.json`).
 
 ## Offline & privacy
 

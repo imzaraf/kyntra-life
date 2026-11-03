@@ -1,6 +1,7 @@
 "use client";
 
-import { orderBy, where } from "firebase/firestore";
+import { where } from "firebase/firestore";
+import { useMemo } from "react";
 import { useRepoQuery } from "@/hooks/use-repo-query";
 import { taskRepo } from "@/lib/repositories";
 
@@ -8,9 +9,14 @@ import { taskRepo } from "@/lib/repositories";
 export const useOpenTasks = () =>
   useRepoQuery(taskRepo, () => [where("status", "==", "todo")], "open");
 
-export const useCompletedTasks = () =>
-  useRepoQuery(
-    taskRepo,
-    () => [where("status", "==", "done"), orderBy("completedAt", "desc")],
-    "done",
-  );
+/** Completed tasks, newest first. Sorted here so no composite index is needed. */
+export function useCompletedTasks() {
+  const query = useRepoQuery(taskRepo, () => [where("status", "==", "done")], "done");
+  return useMemo(() => {
+    const time = (d?: Date) => d?.getTime() ?? 0;
+    const data = [...query.data].sort(
+      (a, b) => time(b.completedAt ?? b.updatedAt) - time(a.completedAt ?? a.updatedAt),
+    );
+    return { ...query, data };
+  }, [query]);
+}

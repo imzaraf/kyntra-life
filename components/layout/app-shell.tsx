@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/logo";
 import { useAuth } from "@/features/auth/auth-provider";
 import { QuickCapture } from "@/features/quick-capture/quick-capture";
+import { usePushTokenSync } from "@/features/settings/use-push-token-sync";
 import { useReminderWatcher } from "@/features/reminders/use-reminder-watcher";
 import { useOnline } from "@/hooks/use-online";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const online = useOnline();
   const [captureOpen, setCaptureOpen] = useState(false);
   const { attentionCount } = useReminderWatcher();
+  usePushTokenSync();
 
   useEffect(() => {
     if (status === "signed-out" || status === "misconfigured") router.replace("/sign-in");

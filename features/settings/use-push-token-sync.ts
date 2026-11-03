@@ -20,8 +20,20 @@ export function usePushTokenSync() {
     void (async () => {
       try {
         const support = await getPushSupport();
-        if (cancelled || support.state !== "granted") return;
+        if (cancelled) return;
+        if (support.state !== "granted") {
+          // Say why, so an empty collection is explainable from the console alone.
+          const why =
+            support.state === "unsupported" || support.state === "unconfigured"
+              ? support.reason
+              : support.state === "denied"
+                ? "notifications are blocked for this site"
+                : "notification permission hasn't been granted for THIS address yet (permission is per-site: localhost and your Vercel URL are separate). Open Settings → Enable notifications.";
+          console.warn(`[push] not registering this device: ${why}`);
+          return;
+        }
         await syncPushToken(uid);
+        console.warn("[push] device registered");
       } catch (error) {
         console.error("Push registration failed", error);
       }

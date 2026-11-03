@@ -79,3 +79,47 @@ export async function disablePush(uid: string): Promise<void> {
   if (token) await tokenRepo.remove(uid, await tokenId(token)).catch(() => undefined);
   await deleteToken(getMessaging(app)).catch(() => undefined);
 }
+
+export interface PushDiagnostics {
+  /** Is the VAPID key present in THIS build? (NEXT_PUBLIC_ vars are baked in at build time.) */
+  vapidConfigured: boolean;
+  /** Does this browser support web push at all? */
+  fcmSupported: boolean;
+  /** Notification.permission */
+  permission: NotificationPermission | "unsupported";
+  /** Is our service worker registered and active? */
+  serviceWorker: "active" | "installing" | "none" | "unsupported";
+  /** How many device tokens are saved for this user in Firestore (null = couldn't read). */
+  savedTokens: number | null;
+  /** Error from reading tokens, e.g. permission-denied. */
+  tokenReadError?: string;
+}
+
+export async function collectPushDiagnostics(uid: string): Promise<PushDiagnostics> {
+  const { env } = getFirebase();
+  const reg =
+    "serviceWorker" in navigator
+      ? await navigator.serviceWorker.getRegistration()
+      : undefined;
+  let savedTokens: number | null = null;
+  let tokenReadError: string | undefined;
+  try {
+    savedTokens = (await tokenRepo.list(uid)).length;
+  } catch (error) {
+    tokenReadError = (error as { code?: string }).code ?? String(error);
+  }
+  return {
+    vapidConfigured: !!env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+    fcmSupported: await isSupported().catch(() => false),
+    permission: "Notification" in window ? Notification.permission : "unsupported",
+    serviceWorker: !("serviceWorker" in navigator)
+      ? "unsupported"
+      : reg?.active
+        ? "active"
+        : reg?.installing || reg?.waiting
+          ? "installing"
+          : "none",
+    savedTokens,
+    tokenReadError,
+  };
+}

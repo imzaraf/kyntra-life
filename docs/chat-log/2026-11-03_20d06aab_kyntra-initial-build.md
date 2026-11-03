@@ -135,3 +135,16 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 
 ## Gotchas
 - The Firestore console only shows collections that have documents; an absent `notificationTokens` means no token was ever written.
+
+## Follow-ups (pushed fixes; token still missing; toast contrast)
+- Pushed `b946940` (sw v4 payload handling, real push-error messages, chat log) — main in sync, 0 trailers.
+- User's new Firestore screenshot: still only `reminders` + `tasks` under their user → still no `notificationTokens`; user hasn't reported what Settings → Enable notifications showed. Asked for: the exact sentence under "Push notifications", the red error code after clicking Enable, or console "Token sync failed" line; checks: VAPID key name in Vercel + redeploy, notifications allowed in browser.
+- In-app reminder toasts had unreadable text/buttons in dark mode (low-contrast Snooze/description). Fixed with explicit sonner classNames in `components/layout/providers.tsx` (title/description/action/cancel). Commit `cb17e74` local, unpushed, not visually verified. tsc/eslint pass.
+
+## Left
+- Push `cb17e74` when user says so.
+- Waiting on Settings status/error text to find why no FCM token is saved (candidates: VAPID missing in build, FCM API/key restrictions, Firestore rules, SW registration). Then Blaze + deploy `deliverDueReminders`.
+- Still open: Flaticon SVGs, README placeholders, optional CI action bumps.
+
+## Gotchas
+- Multiple stacked reminder toasts appear when several reminders are due at once (each has its own toast); consider capping if noisy.

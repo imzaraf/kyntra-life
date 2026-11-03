@@ -1,0 +1,289 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ───────────────────────────────────────────────────────────
+   Kyntra design tokens — quiet luxury, warm paper, deep forest
+   ─────────────────────────────────────────────────────────── */
+:root {
+  --background: #f4f1ea;
+  --foreground: #292d2a;
+  --surface: #fbfaf6;
+  --surface-raised: #fffefb;
+  --card: #fbfaf6;
+  --card-foreground: #292d2a;
+  --popover: #fffefb;
+  --popover-foreground: #292d2a;
+  --primary: #30382f;
+  --primary-foreground: #f6f3ea;
+  --secondary: #ebe7dc;
+  --secondary-foreground: #30382f;
+  --muted: #eeeae0;
+  --muted-foreground: #6f7067;
+  --accent: #e7e9dc;
+  --accent-foreground: #30382f;
+  --destructive: #b2503a;
+  --border: #e5e0d6;
+  --input: #ddd7ca;
+  --ring: #a7ac91;
+  --sage: #a7ac91;
+  --sage-soft: #e3e6d6;
+  --terracotta: #c98468;
+  --terracotta-soft: #f3e1d7;
+  --forest: #30382f;
+  --gold: #b9985a;
+  --radius: 0.75rem;
+  --shadow-xs: 0 1px 0 rgb(41 45 42 / 0.04);
+  --shadow-sm: 0 1px 2px rgb(41 45 42 / 0.05), 0 1px 1px rgb(41 45 42 / 0.03);
+  --shadow-md: 0 2px 4px rgb(41 45 42 / 0.04), 0 8px 24px -6px rgb(41 45 42 / 0.1);
+  --shadow-lg: 0 4px 8px rgb(41 45 42 / 0.05), 0 24px 56px -12px rgb(41 45 42 / 0.2);
+  --glass: rgb(251 250 246 / 0.72);
+  --glass-border: rgb(255 255 255 / 0.6);
+  --ease-luxe: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --sidebar: #efebe1;
+  --sidebar-foreground: #292d2a;
+  --sidebar-primary: #30382f;
+  --sidebar-primary-foreground: #f6f3ea;
+  --sidebar-accent: #e2e4d3;
+  --sidebar-accent-foreground: #30382f;
+  --sidebar-border: #e0dacd;
+  --sidebar-ring: #a7ac91;
+  --chart-1: #30382f;
+  --chart-2: #a7ac91;
+  --chart-3: #c98468;
+  --chart-4: #b9985a;
+  --chart-5: #77786f;
+}
+
+.dark {
+  --background: #171a17;
+  --foreground: #ece8dc;
+  --surface: #1e221e;
+  --surface-raised: #252a25;
+  --card: #1e221e;
+  --card-foreground: #ece8dc;
+  --popover: #252a25;
+  --popover-foreground: #ece8dc;
+  --primary: #d9ddc6;
+  --primary-foreground: #1b1f1b;
+  --secondary: #2a2f29;
+  --secondary-foreground: #ece8dc;
+  --muted: #262b26;
+  --muted-foreground: #9a9c8f;
+  --accent: #2d3329;
+  --accent-foreground: #e4e7d2;
+  --destructive: #e08b72;
+  --border: #2d322c;
+  --input: #363c35;
+  --ring: #7d836b;
+  --sage: #8a9074;
+  --sage-soft: #2b3027;
+  --terracotta: #d99578;
+  --terracotta-soft: #3a2b25;
+  --forest: #d9ddc6;
+  --gold: #cfae6c;
+  --shadow-xs: 0 1px 0 rgb(0 0 0 / 0.2);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 2px 4px rgb(0 0 0 / 0.25), 0 8px 24px -6px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 4px 8px rgb(0 0 0 / 0.3), 0 24px 56px -12px rgb(0 0 0 / 0.6);
+  --glass: rgb(30 34 30 / 0.72);
+  --glass-border: rgb(255 255 255 / 0.08);
+  --sidebar: #141714;
+  --sidebar-foreground: #ece8dc;
+  --sidebar-primary: #d9ddc6;
+  --sidebar-primary-foreground: #1b1f1b;
+  --sidebar-accent: #252a24;
+  --sidebar-accent-foreground: #e4e7d2;
+  --sidebar-border: #262b25;
+  --sidebar-ring: #7d836b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-serif);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-sage: var(--sage);
+  --color-sage-soft: var(--sage-soft);
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-soft: var(--terracotta-soft);
+  --color-forest: var(--forest);
+  --color-gold: var(--gold);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: var(--radius);
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --ease-luxe: var(--ease-luxe);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01", "ss03";
+    background-image:
+      radial-gradient(1200px 600px at 12% -10%, rgb(167 172 145 / 0.16), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgb(201 132 104 / 0.09), transparent 55%);
+    background-attachment: fixed;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-serif tracking-tight;
+  }
+  ::selection {
+    background: rgb(167 172 145 / 0.45);
+  }
+}
+
+@layer components {
+  .paper {
+    @apply rounded-2xl border border-border bg-surface;
+    box-shadow: var(--shadow-sm);
+  }
+  .paper-raised {
+    @apply rounded-2xl border border-border bg-surface-raised;
+    box-shadow: var(--shadow-md);
+  }
+  .glass {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    backdrop-filter: blur(22px) saturate(1.4);
+    box-shadow: var(--shadow-lg);
+  }
+  .eyebrow {
+    @apply text-[0.68rem] font-medium tracking-[0.16em] text-muted-foreground uppercase;
+  }
+  .hover-lift {
+    transition:
+      transform 0.25s var(--ease-luxe),
+      box-shadow 0.25s var(--ease-luxe);
+  }
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.5s var(--ease-luxe) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Readable long-form Markdown for journal & notes */
+.prose-kyntra {
+  @apply text-[1.02rem] leading-[1.8] text-foreground;
+}
+.prose-kyntra > * + * {
+  margin-top: 1em;
+}
+.prose-kyntra h1,
+.prose-kyntra h2,
+.prose-kyntra h3 {
+  @apply font-serif leading-tight;
+  margin-top: 1.6em;
+}
+.prose-kyntra h1 {
+  @apply text-3xl;
+}
+.prose-kyntra h2 {
+  @apply text-2xl;
+}
+.prose-kyntra h3 {
+  @apply text-xl;
+}
+.prose-kyntra a {
+  @apply text-terracotta underline underline-offset-4;
+}
+.prose-kyntra ul {
+  @apply list-disc pl-6;
+}
+.prose-kyntra ol {
+  @apply list-decimal pl-6;
+}
+.prose-kyntra blockquote {
+  @apply border-l-2 border-sage pl-4 font-serif text-muted-foreground italic;
+}
+.prose-kyntra code {
+  @apply rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.88em];
+}
+.prose-kyntra pre {
+  @apply overflow-x-auto rounded-xl bg-muted p-4;
+}
+.prose-kyntra pre code {
+  @apply bg-transparent p-0;
+}
+.prose-kyntra hr {
+  @apply border-border;
+}
+.prose-kyntra input[type="checkbox"] {
+  @apply mr-2 align-middle;
+}

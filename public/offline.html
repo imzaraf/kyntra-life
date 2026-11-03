@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline · Kyntra Life</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        background: #f4f1ea;
+        color: #292d2a;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        text-align: center;
+        padding: 24px;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #171a17;
+          color: #ece8dc;
+        }
+      }
+      h1 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+        font-size: 2rem;
+        margin: 0 0 0.5rem;
+      }
+      p {
+        color: #77786f;
+        max-width: 26rem;
+        margin: 0 auto 1.5rem;
+        line-height: 1.6;
+      }
+      button {
+        font: inherit;
+        padding: 0.7rem 1.4rem;
+        border: 0;
+        border-radius: 12px;
+        background: #30382f;
+        color: #f6f3ea;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>You're offline.</h1>
+      <p>
+        Kyntra needs a connection to open for the first time. Anything you've already
+        opened will keep working, and changes sync when you're back online.
+      </p>
+      <button onclick="location.reload()">Try again</button>
+    </main>
+  </body>
+</html>

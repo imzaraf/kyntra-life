@@ -1,0 +1,155 @@
+rules_version = '2';
+
+// Kyntra security rules — deny by default; every document is owned by a UID.
+// Frontend route protection is NOT the security boundary; these rules are.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // Bookkeeping fields every client-written document may carry.
+    function meta() { return ['schemaVersion', 'createdAt', 'updatedAt']; }
+    function only(fields) { return request.resource.data.keys().hasOnly(fields.concat(meta())); }
+    function str(field, max) {
+      return request.resource.data[field] is string && request.resource.data[field].size() <= max;
+    }
+    function nonEmptyStr(field, max) {
+      return str(field, max) && request.resource.data[field].size() > 0;
+    }
+    function optStr(field, max) {
+      return !(field in request.resource.data) || request.resource.data[field] == null || str(field, max);
+    }
+    function inList(field, values) { return request.resource.data[field] in values; }
+    function stamped() {
+      return request.resource.data.updatedAt == request.time
+        && request.resource.data.schemaVersion is int;
+    }
+
+    // ── users/{uid}: profile root, read-only for the client ──────────────
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow write: if false;
+
+      match /tasks/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && stamped()
+          && only(['title', 'description', 'priority', 'status', 'dueDate', 'dueTime',
+                   'estimateMinutes', 'tags', 'notes', 'subtasks', 'completedAt'])
+          && nonEmptyStr('title', 200)
+          && inList('priority', ['low', 'medium', 'high'])
+          && inList('status', ['todo', 'done', 'archived'])
+          && request.resource.data.tags is list && request.resource.data.tags.size() <= 30
+          && request.resource.data.subtasks is list && request.resource.data.subtasks.size() <= 100;
+      }
+
+      match /timeBlocks/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && stamped()
+          && only(['title', 'date', 'startMin', 'endMin', 'notes', 'taskId'])
+          && nonEmptyStr('title', 120)
+          && str('date', 10)
+          && request.resource.data.startMin is int && request.resource.data.endMin is int
+          && request.resource.data.startMin >= 0 && request.resource.data.endMin <= 1440
+          && request.resource.data.endMin > request.resource.data.startMin;
+      }
+
+      // `delivery` is server-owned: written only by Cloud Functions (Admin SDK bypasses rules).
+      match /reminders/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create: if isOwner(uid) && stamped()
+          && !('delivery' in request.resource.data)
+          && only(['title', 'note', 'scheduledAt', 'status', 'notify', 'notifyPending',
+                   'timeZone', 'taskId', 'blockId'])
+          && nonEmptyStr('title', 200)
+          && request.resource.data.scheduledAt is timestamp
+          && inList('status', ['pending', 'completed', 'dismissed'])
+          && request.resource.data.notify is bool
+          && request.resource.data.notifyPending is bool;
+        allow update: if isOwner(uid) && stamped()
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['delivery'])
+          && only(['title', 'note', 'scheduledAt', 'status', 'notify', 'notifyPending',
+                   'timeZone', 'taskId', 'blockId', 'delivery'])
+          && nonEmptyStr('title', 200)
+          && request.resource.data.scheduledAt is timestamp
+          && inList('status', ['pending', 'completed', 'dismissed'])
+          && request.resource.data.notify is bool
+          && request.resource.data.notifyPending is bool;
+      }
+
+      match /journalEntries/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && stamped()
+          && only(['title', 'date', 'body', 'mood', 'energy', 'focus'])
+          && optStr('title', 160)
+          && str('date', 10)
+          && str('body', 200000);
+      }
+
+      match /routines/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && stamped()
+          && only(['title', 'frequency', 'days', 'marks', 'archived'])
+          && nonEmptyStr('title', 200)
+          && inList('frequency', ['daily', 'weekly'])
+          && request.resource.data.archived is bool
+          && request.resource.data.marks is map;
+      }
+
+      match /learningItems/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && stamped()
+          && only(['category', 'title', 'notes', 'status', 'tags', 'nextReviewDate', 'minutesStudied'])
+          && nonEmptyStr('category', 100)
+          && nonEmptyStr('title', 300)
+          && inList('status', ['learning', 'reviewing', 'mastered'])
+          && request.resource.data.minutesStudied is int;
+      }
+
+      match /savedResources/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && stamped()
+          && only(['url', 'title', 'source', 'notes', 'tags', 'collection', 'status'])
+          && nonEmptyStr('title', 300)
+          && str('url', 2048)
+          && (request.resource.data.url.matches('^https?://.*'))
+          && inList('status', ['unread', 'in_progress', 'done']);
+      }
+
+      match /ideas/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && stamped()
+          && only(['title', 'body', 'status', 'tags', 'convertedTaskId'])
+          && nonEmptyStr('title', 300)
+          && inList('status', ['inbox', 'exploring', 'planned', 'in_progress', 'done', 'archived']);
+      }
+
+      match /plans/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && stamped()
+          && only(['kind', 'title', 'status', 'targetDate', 'notes', 'destination', 'budgetNotes', 'links'])
+          && nonEmptyStr('title', 300)
+          && inList('kind', ['goal', 'plan', 'someday', 'trip'])
+          && inList('status', ['considering', 'planned', 'active', 'completed', 'canceled']);
+      }
+
+      // Device FCM tokens: the owner manages their own devices.
+      match /notificationTokens/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && stamped()
+          && only(['token', 'userAgent'])
+          && nonEmptyStr('token', 4096);
+      }
+
+      // Delivery ledger: trusted server only. The owner may read their history.
+      match /notificationDeliveries/{id} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

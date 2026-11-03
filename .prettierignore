@@ -1,0 +1,11 @@
+.next
+node_modules
+coverage
+playwright-report
+test-results
+functions/lib
+package-lock.json
+docs/chat-log
+public/sw.js
+public/firebase-messaging-sw.js
+KYNTRA_LIFE_CLAUDE_BUILD_SPEC.md

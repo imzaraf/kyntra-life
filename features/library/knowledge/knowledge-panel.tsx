@@ -154,7 +154,7 @@ export function KnowledgePanel() {
                 key={r.id}
                 className="paper hover-lift flex flex-wrap items-center gap-3 p-4"
               >
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-[1_1_100%] sm:flex-1">
                   <a
                     href={r.url}
                     target="_blank"

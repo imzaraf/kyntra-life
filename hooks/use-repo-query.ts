@@ -34,7 +34,11 @@ export function useRepoQuery<T extends { id: string }>(
       uid,
       constraints(),
       (data) => setState({ data, loading: false, error: null }),
-      (error) => setState((s) => ({ ...s, loading: false, error })),
+      (error) => {
+        // Keep the full message: for missing indexes Firestore includes a one-click creation link.
+        console.error(`Firestore query failed (${repo.name}):`, error);
+        setState((s) => ({ ...s, loading: false, error }));
+      },
     );
     return unsubscribe;
     // `constraints` is intentionally keyed by `key`

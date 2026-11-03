@@ -115,7 +115,7 @@ export function RoutinesPanel() {
             return (
               <li key={r.id} className="paper p-4">
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-[1_1_100%] sm:flex-1">
                     <p className="font-medium">{r.title}</p>
                     <p className="mt-0.5 flex items-center gap-3 text-xs text-muted-foreground">
                       <span>

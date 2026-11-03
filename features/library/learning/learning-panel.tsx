@@ -133,7 +133,7 @@ export function LearningPanel() {
                     key={i.id}
                     className="paper hover-lift flex flex-wrap items-center gap-3 p-4"
                   >
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-[1_1_100%] sm:flex-1">
                       <p className="flex items-center gap-2 font-medium">
                         {i.title} <StatusBadge label={i.status} />
                       </p>

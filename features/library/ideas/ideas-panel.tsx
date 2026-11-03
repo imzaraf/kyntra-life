@@ -114,7 +114,7 @@ export function IdeasPanel() {
           {list.map((i) => (
             <li key={i.id} className="paper flex flex-wrap items-center gap-3 p-4">
               <Lightbulb className="size-4 shrink-0 text-gold" strokeWidth={1.6} />
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-[1_1_calc(100%-2rem)] sm:flex-1">
                 <p className="font-medium">{i.title}</p>
                 {i.convertedTaskId && (
                   <Badge variant="secondary" className="mt-1 rounded-md font-normal">

@@ -33,15 +33,17 @@ export function ErrorNotice({
   error: Error;
   label?: string;
 }) {
-  const denied = (error as { code?: string }).code === "permission-denied";
+  const code = (error as { code?: string }).code;
+  const message =
+    code === "permission-denied"
+      ? "Permission denied. Check that you're signed in and that the Firestore rules are published."
+      : code === "failed-precondition"
+        ? "This view needs a database index that hasn't been created yet. Publish the indexes with `npx firebase deploy --only firestore:indexes`, or open the browser console and click the link Firestore prints."
+        : "Check your connection and try again.";
   return (
     <div role="alert" className="rounded-2xl bg-terracotta-soft p-4 text-sm">
       <p className="font-medium">{label}</p>
-      <p className="mt-1 text-muted-foreground">
-        {denied
-          ? "Permission denied. Check that you're signed in and that Firestore rules are deployed."
-          : "Check your connection and try again."}
-      </p>
+      <p className="mt-1 text-muted-foreground">{message}</p>
     </div>
   );
 }

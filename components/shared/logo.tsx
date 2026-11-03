@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-type Variant = "horizontal" | "stacked" | "mark";
+type Variant = "horizontal" | "horizontal-tagline" | "stacked" | "mark";
 
 const ASSETS: Record<
   Variant,
@@ -10,6 +10,12 @@ const ASSETS: Record<
   horizontal: {
     light: "/brand/logo-horizontal-notagline.svg",
     dark: "/brand/logo-horizontal-notagline-dark.svg",
+    width: 706,
+    height: 220,
+  },
+  "horizontal-tagline": {
+    light: "/brand/logo-horizontal.svg",
+    dark: "/brand/logo-horizontal-dark.svg",
     width: 706,
     height: 220,
   },

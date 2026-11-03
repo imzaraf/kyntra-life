@@ -13,6 +13,7 @@ import { useOnline } from "@/hooks/use-online";
 import { cn } from "@/lib/utils";
 import { AccountMenu } from "./account-menu";
 import { AppIcon } from "@/components/shared/app-icon";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { NAV_ITEMS } from "./nav-items";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -101,9 +102,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             this device and sync when you reconnect.
           </div>
         )}
-        <header className="flex items-center justify-between px-5 pt-5 md:hidden">
-          <Logo className="h-9" />
-          <AccountMenu compact />
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-background/85 px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 shadow-[0_1px_0_rgb(255_255_255/0.5),0_6px_16px_-12px_rgb(41_45_42/0.35)] backdrop-blur-xl md:hidden dark:shadow-[0_6px_16px_-12px_rgb(0_0_0/0.7)]">
+          <Logo variant="horizontal-tagline" className="h-12" />
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <AccountMenu compact />
+          </div>
         </header>
         <main className="mx-auto w-full max-w-6xl px-5 py-6 md:px-10 md:py-10">
           {children}

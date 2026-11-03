@@ -63,3 +63,24 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 ## Gotchas
 - Prettier wraps JSX so python string-replace edits can silently miss (logo class fix needed a second pass) — verify with grep.
 - `git rm --cached app/favicon.ico` slip untracked it; re-added.
+
+## Follow-ups (Vercel env + mobile top bar)
+- Brand assets commit `afd903a` pushed to main. Gave Vercel env list (Firebase public config, `NEXT_PUBLIC_USE_FIREBASE_EMULATORS=false`, `NEXT_PUBLIC_SITE_URL`; VAPID optional) and reminded: add Vercel domain to Firebase Auth authorized domains, publish Firestore rules.
+- Mobile top bar (`components/layout/app-shell.tsx`): sticky, bordered, blurred, safe-area aware; added `components/shared/theme-toggle.tsx` (CSS-swapped sun/moon icons, no hydration mismatch); new `horizontal-tagline` Logo variant under the wordmark.
+- Theme default set to light (`providers.tsx`, `defaultTheme="light"`, system still selectable) — verified OS-dark still opens light.
+- Dark-mode shadow tweak so the bar's highlight line isn't too bright. Checks pass (tsc, eslint, prettier, 40 tests); verified via scratch-copy screenshots.
+
+## Left
+- These top-bar/theme changes are uncommitted/unpushed.
+- Still open: publish Firestore rules/indexes, add Vercel env + authorized domain, Flaticon SVGs, VAPID key, Blaze + functions deploy, README placeholders, optionally tagline in desktop sidebar.
+
+## Follow-ups (mobile layout fixes, PWA name, index error)
+- Mobile UI fixes: Today stat labels shortened to Done / To do / Overdue (single-line, numbers align); list rows (ideas, vault, learning, routines) give the title a full-width line on mobile (`flex-[1_1_100%] sm:flex-1`) so selects/buttons no longer squeeze it. Verified via scratch-copy screenshots.
+- PWA `short_name` changed to "Kyntra Life" (manifest + brand-assets copy). Installed copies keep old name until reinstalled.
+- Reminders tab "Couldn't load this / Check your connection" diagnosed as Firestore `failed-precondition` (missing composite index). `ErrorNotice` now explains index errors; `useRepoQuery` logs full Firestore error (includes create-index link).
+- Gotcha: `ErrorNotice` previously mapped everything except permission-denied to "check your connection".
+
+## Left
+- User must publish indexes: `npx firebase login` then `npx firebase deploy --only firestore:indexes` (or click console link). CLI not logged in here; nothing deployed by me.
+- Uncommitted/unpushed: top bar/theme toggle, light default, mobile row fixes, PWA name, error-notice change.
+- Still open: publish Firestore rules, Vercel env + authorized domain, Flaticon SVGs, VAPID key, Blaze + functions deploy, README placeholders.

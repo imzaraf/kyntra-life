@@ -81,8 +81,8 @@ export function TodayView() {
       {activity.isBrandNew && <Onboarding onAddTask={() => setAdding(true)} />}
 
       <div className="rise grid grid-cols-3 gap-3" style={{ animationDelay: "60ms" }}>
-        <Stat label="Done today" value={counts.done} of={counts.total} />
-        <Stat label="Still to do" value={todays.length} />
+        <Stat label="Done" value={counts.done} of={counts.total} />
+        <Stat label="To do" value={todays.length} />
         <Stat
           label="Overdue"
           value={counts.overdue}

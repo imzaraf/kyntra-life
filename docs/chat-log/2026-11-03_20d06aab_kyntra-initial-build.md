@@ -163,3 +163,17 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 ## Gotchas
 - Silent early-returns hide root causes; always log why a step is skipped.
 - Notification permission is per origin; allowing on phone/Vercel doesn't allow localhost.
+
+## Follow-ups (registration verified, console test message silent)
+- Verified device registration end-to-end with Playwright using real Chrome (`channel: "chrome"`, persistent profile) + throwaway Firebase account on the real project: `[push] device registered`, 1 doc in `notificationTokens`, all troubleshooting rows ✓; account + data deleted via REST after each run (3 runs). Bundled Chromium / incognito profiles can't subscribe to push (`AbortError: Registration failed - permission denied`) — test-env limitation, not an app bug. Diagnostics panel took ~15s to render (possible slow `getDocs`); optional timeout fix not done.
+- User then saw `[push] device registered` in their dev terminal and the `notificationTokens` collection in Firestore. Pushed everything through `53835a0` (main in sync, 0 trailers).
+- User sent a console "test message" to their token; nothing shown, no sound. Cause #1 (mine): `public/sw.js` suppressed pushes while a Kyntra tab was visible. Fix `fe31033` (sw v5): suppress only `reminder-*` tagged pushes when visible; other pushes always shown. Local, unpushed. Other likely causes: macOS Notification settings for Chrome / Focus mode, Chrome site permission, stale token. Reminded user to treat tokens as private.
+
+## Left
+- Push `fe31033` when user says so.
+- Closed-app delivery still needs Blaze + `firebase deploy --only functions,firestore` (user's login/billing); then end-to-end test with a reminder 2 min ahead, app closed.
+- Still open: phone registration check after Vercel redeploy, Flaticon SVGs, README placeholders, CI action bumps, optional diagnostics timeout.
+
+## Gotchas
+- Never log/paste FCM tokens; they authorise sending to a device.
+- Chrome notification sound/visibility on macOS is governed by OS settings (Notifications → Google Chrome, Focus).

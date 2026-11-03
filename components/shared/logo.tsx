@@ -1,21 +1,64 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
+type Variant = "horizontal" | "stacked" | "mark";
+
+const ASSETS: Record<
+  Variant,
+  { light: string; dark: string; width: number; height: number }
+> = {
+  horizontal: {
+    light: "/brand/logo-horizontal-notagline.svg",
+    dark: "/brand/logo-horizontal-notagline-dark.svg",
+    width: 706,
+    height: 220,
+  },
+  stacked: {
+    light: "/brand/logo-primary-transparent.svg",
+    dark: "/brand/logo-primary-dark-transparent.svg",
+    width: 760,
+    height: 640,
+  },
+  mark: {
+    light: "/brand/mark-forest.svg",
+    dark: "/brand/mark-ivory.svg",
+    width: 250,
+    height: 330,
+  },
+};
+
+/**
+ * Kyntra Life logo. Renders both theme variants and lets CSS show the right one,
+ * so there is no flash or hydration mismatch when the theme resolves.
+ * Size it with a height class, e.g. `className="h-10"`.
+ */
 export function Logo({
   className,
-  compact = false,
+  variant = "horizontal",
 }: {
   className?: string;
-  compact?: boolean;
+  variant?: Variant;
 }) {
+  const a = ASSETS[variant];
+  const img = (src: string, extra: string) => (
+    <Image
+      src={src}
+      alt=""
+      width={a.width}
+      height={a.height}
+      unoptimized
+      priority
+      className={cn("h-full w-auto", extra)}
+    />
+  );
   return (
-    <div className={cn("flex items-center gap-2.5", className)}>
-      <span
-        aria-hidden
-        className="grid size-8 place-items-center rounded-[10px] bg-primary font-serif text-lg text-primary-foreground italic shadow-[inset_0_1px_0_rgb(255_255_255/0.15),var(--shadow-sm)]"
-      >
-        K
-      </span>
-      {!compact && <span className="font-serif text-xl tracking-tight">Kyntra Life</span>}
-    </div>
+    <span
+      role="img"
+      aria-label="Kyntra Life"
+      className={cn("block h-10 w-fit", className)}
+    >
+      {img(a.light, "dark:hidden")}
+      {img(a.dark, "hidden dark:block")}
+    </span>
   );
 }

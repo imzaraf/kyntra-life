@@ -61,7 +61,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
   return (
     <div className="glass rise w-full max-w-md rounded-3xl p-8 sm:p-10">
-      <Logo className="mb-8" />
+      <Logo variant="stacked" className="mx-auto mb-6 h-36" />
       <h1 className="text-3xl leading-tight">
         {isSignUp ? "Begin your collection." : "Welcome back."}
       </h1>

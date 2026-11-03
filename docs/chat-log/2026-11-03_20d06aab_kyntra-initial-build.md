@@ -49,3 +49,17 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 
 ## Left
 - Publish Firestore rules/indexes, add Flaticon SVGs, VAPID key, Blaze + functions deploy; run `npm run format`; fill README placeholders.
+
+## Follow-ups (git + brand assets)
+- Pushed initial commit `0c586c7` to `git@github.com:imzaraf/kyntra-life.git` (main). Staged set checked: no env/keys. Pre-commit (husky + lint-staged) ran fine. Suggested repo description/topics given.
+- Mapped `public/kyntra-life-brand-assets/` (assets' README assumed `src/`, adapted): `pwa/*.png` → `public/icons/`; merged manifest (kept id/shortcuts/categories); `app/favicon.ico`, `app/icon.svg`, `app/apple-icon.png`, `app/opengraph-image.png`, `app/twitter-image.png` (Next file conventions); logos/marks → `public/brand/`. Deleted old placeholder icons; `sw.js` paths updated + cache bumped to v2; layout got `metadataBase` (`NEXT_PUBLIC_SITE_URL` in `.env.example`) and OG/Twitter metadata.
+- `components/shared/logo.tsx` now renders real logo (variants horizontal/stacked/mark, light+dark via CSS). Stacked logo files had opaque bg rects → used transparent light file and generated `logo-primary-dark-transparent.svg`. Removed duplicate tagline under auth card.
+- Verified in production build of scratch copy: 11 manifest icons + favicon/apple/OG/sw resolve; lint, tsc, prettier, 40 tests pass.
+
+## Left
+- Commit/push these brand changes (uncommitted); set `NEXT_PUBLIC_SITE_URL` on deploy; consider moving `public/kyntra-life-brand-assets/` out of `public/`; test PWA install on a real device.
+- Still open from before: publish Firestore rules/indexes, Flaticon SVGs, VAPID key, Blaze + functions deploy; README placeholders (repo URL, screenshots).
+
+## Gotchas
+- Prettier wraps JSX so python string-replace edits can silently miss (logo class fix needed a second pass) — verify with grep.
+- `git rm --cached app/favicon.ico` slip untracked it; re-added.

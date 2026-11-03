@@ -9,9 +9,14 @@
  * Private data is never cached here: Firestore traffic is cross-origin and bypassed,
  * and HTML documents are not cached (only the static offline page).
  */
-const VERSION = "kyntra-v1";
+const VERSION = "kyntra-v2";
 const STATIC_CACHE = `${VERSION}-static`;
-const PRECACHE = ["/offline.html", "/icon.svg", "/icon-192.png", "/manifest.webmanifest"];
+const PRECACHE = [
+  "/offline.html",
+  "/icons/icon-192.png",
+  "/brand/mark-forest.svg",
+  "/manifest.webmanifest",
+];
 const isLocalDev = self.location.hostname === "localhost" || self.location.hostname === "127.0.0.1";
 
 self.addEventListener("install", (event) => {
@@ -75,8 +80,8 @@ self.addEventListener("push", (event) => {
       return self.registration.showNotification(d.title, {
         body: d.body || "",
         tag: d.tag || undefined,
-        icon: "/icon-192.png",
-        badge: "/icon-192.png",
+        icon: "/icons/icon-192.png",
+        badge: "/icons/icon-96.png",
         data: { url: safePath(d.url) },
       });
     }),

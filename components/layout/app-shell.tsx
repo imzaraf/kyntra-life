@@ -102,7 +102,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         )}
         <header className="flex items-center justify-between px-5 pt-5 md:hidden">
-          <Logo />
+          <Logo className="h-9" />
           <AccountMenu compact />
         </header>
         <main className="mx-auto w-full max-w-6xl px-5 py-6 md:px-10 md:py-10">
@@ -183,7 +183,7 @@ function ShellSkeleton() {
       aria-busy="true"
       aria-label="Loading Kyntra Life"
     >
-      <Logo className="animate-pulse" />
+      <Logo variant="mark" className="h-14 animate-pulse" />
     </div>
   );
 }

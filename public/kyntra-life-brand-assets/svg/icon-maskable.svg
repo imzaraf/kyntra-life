@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3A4339"/><stop offset="1" stop-color="#232A22"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="0" fill="url(#bg)"/>
+  
+  <g transform="translate(256 262) scale(0.84) translate(-283 -243)">
+  <g>
+    <!-- stem with hairline serifs -->
+    <path d="M178 126 H236 V133 H210 V379 H236 V386 H178 V379 H204 V133 H178 Z" fill="#F4F1EA"/>
+    <rect x="204" y="133" width="6" height="246" fill="#F4F1EA"/>
+    <!-- weighty leg -->
+    <path d="M226 254 L258 250 L364 379 H386 V386 H308 V379 H328 Z" fill="#F4F1EA"/>
+    <!-- hairline arm -->
+    <path d="M210 270 L318 174" stroke="#F4F1EA" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <!-- leaf growing from the arm tip -->
+    <g transform="translate(314 178) rotate(-58)">
+      <path d="M0 0 C 6 -34, 50 -52, 104 -30 C 96 16, 52 36, 0 0 Z" fill="#C98468"/>
+      <path d="M4 -2 C 34 -12, 66 -20, 96 -28" stroke="#30382F" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".5"/>
+    </g>
+  </g></g>
+</svg>

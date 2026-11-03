@@ -13,13 +13,16 @@ const fraunces = Fraunces({
 const mono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  // Icons, favicon, apple-icon and the OG/Twitter images come from the file conventions in /app.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  openGraph: { siteName: "Kyntra Life", type: "website" },
+  twitter: { card: "summary_large_image" },
   title: { default: "Kyntra Life — Your life, collected.", template: "%s · Kyntra Life" },
   description:
     "Kin what belongs to you. Track it. A luxurious personal Life OS: diary, planner, reminders and library.",
   applicationName: "Kyntra Life",
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "Kyntra Life", statusBarStyle: "default" },
-  icons: { icon: "/icon.svg", apple: "/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {

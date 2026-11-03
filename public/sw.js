@@ -9,7 +9,7 @@
  * Private data is never cached here: Firestore traffic is cross-origin and bypassed,
  * and HTML documents are not cached (only the static offline page).
  */
-const VERSION = "kyntra-v3";
+const VERSION = "kyntra-v4";
 const STATIC_CACHE = `${VERSION}-static`;
 const PRECACHE = [
   "/offline.html",
@@ -62,23 +62,27 @@ function safePath(p) {
 }
 
 self.addEventListener("push", (event) => {
-  if (!event.data) return;
-  let payload;
+  // Parse defensively: any push must end in a visible notification (or the app handling it),
+  // otherwise Chrome shows a generic "site updated in the background" message.
+  let payload = {};
   try {
-    payload = event.data.json();
+    payload = event.data ? event.data.json() : {};
   } catch {
-    return;
+    payload = {};
   }
-  // FCM wraps custom fields in `data`; tolerate a flat payload too.
-  const d = payload.data || payload;
-  if (!d || !d.title) return;
+  // Our server sends data-only messages (`data`); the Firebase console "test message"
+  // sends a `notification` object. Accept both, plus a flat payload.
+  const d = (payload && payload.data) || payload || {};
+  const n = (payload && payload.notification) || {};
+  const title = d.title || n.title || "Kyntra Life";
+  const body = d.body || n.body || "You have a reminder.";
 
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
       // If Kyntra is open and visible, the in-app reminder UI already handles it.
       if (clients.some((c) => c.visibilityState === "visible")) return;
-      return self.registration.showNotification(d.title, {
-        body: d.body || "",
+      return self.registration.showNotification(title, {
+        body,
         tag: d.tag || undefined,
         icon: "/icons/icon-192.png",
         badge: "/icons/icon-96.png",

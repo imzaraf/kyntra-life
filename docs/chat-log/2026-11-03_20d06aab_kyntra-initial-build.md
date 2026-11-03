@@ -108,3 +108,16 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 ## Gotchas
 - Prettier-wrapped JSX makes scripted replaces miss; earlier sidebar `h-12` edit never applied (sidebar logo is default h-10).
 - Combined commit+force-push command was denied as a whole; run safe git steps separately.
+
+## Follow-ups (VAPID key, push, troubleshooting)
+- User generated Web Push key; verified format (87 chars, public) and added `NEXT_PUBLIC_FIREBASE_VAPID_KEY` to git-ignored `.env.local`; told them to add it to Vercel and redeploy (NEXT_PUBLIC_ is build-time).
+- User force-pushed rewritten history themselves; remote now has 0 Claude trailers and is in sync. Pushed `8246c8b` (bell, app badge, device-alert permission) normally; main = `8246c8b`, tree clean.
+- User reports no phone notification when app not active. Diagnosis (unverified, no access to their Firebase): closed-app delivery requires deployed `deliverDueReminders` function (Blaze + `firebase deploy --only functions,firestore`), a saved FCM token (`notificationTokens`), reminder `notify/notifyPending` true then `delivery.status`, collection-group index, and phone-side settings. Gave a step-by-step checklist.
+
+## Left
+- Waiting on user results: function deployed? token doc present? reminder `delivery` field/function logs. Then debug the real push path (never verified against a real project).
+- Still open: Vercel `NEXT_PUBLIC_SITE_URL`/authorized domain check, Flaticon SVGs, README placeholders, optional CI action version bumps.
+
+## Gotchas
+- Backgrounded Android PWAs are frozen within seconds, so in-app/local alerts can't be relied on; only the server push works when closed.
+- Installed PWAs may cache the old build; reinstall after env/redeploy changes.

@@ -177,3 +177,16 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 ## Gotchas
 - Never log/paste FCM tokens; they authorise sending to a device.
 - Chrome notification sound/visibility on macOS is governed by OS settings (Notifications → Google Chrome, Focus).
+
+## Follow-ups (sound)
+- Pushed `1ec84ed` (sw v5: non-reminder pushes shown even when app visible). User confirmed macOS banner works but silent.
+- Sound: system banner sound is OS-controlled (macOS: Notifications → Google Chrome → Play sound; Android: app notification channel). Added our own in-app chime: `lib/notifications/chime.ts` (Web Audio two-note tone, pref in localStorage `kyntra.reminderSound`, default on), played by `use-reminder-watcher.ts` when the due-reminder toast shows and when the service worker posts `kyntra:chime` to live pages (`public/sw.js` v6). Settings: `features/settings/sound-setting.tsx` (switch + Test sound) inside `notification-settings.tsx`; docs/NOTIFICATIONS.md "Sound" section. Verified in browser (renders, toggle persists, no errors); audio itself not audible-tested. tsc/eslint/prettier/40 tests pass. Commit `d5194d3` local, unpushed.
+- Explained PWA behaviour: chime works when app open (needs one tap to unlock audio; uses media volume; iOS silent switch mutes); unreliable when backgrounded (Android freezes); impossible when fully closed (service workers can't play audio) → only OS notification sound.
+
+## Left
+- Push `d5194d3` when user says so; user then reloads/reinstalls PWA to pick up sw v6.
+- Closed-app delivery still needs Blaze + `firebase deploy --only functions,firestore` (user's login/billing); end-to-end test pending.
+- Still open: phone registration check, Flaticon SVGs, README placeholders, CI action bumps, optional diagnostics timeout.
+
+## Gotchas
+- Web Audio needs a prior user gesture; media volume ≠ notification volume.

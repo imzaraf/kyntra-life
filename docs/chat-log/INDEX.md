@@ -1,2 +1,2 @@
 # Chat log index
-- 2026-11-03 — [Kyntra initial build](2026-11-03_20d06aab_kyntra-initial-build.md) — Phase 1 built, flattened, renamed Kyntra Life; pushed to GitHub; brand/PWA pushed; mobile fixes done (uncommitted); Firestore rules + indexes still to publish
+- 2026-11-03 — [Kyntra initial build](2026-11-03_20d06aab_kyntra-initial-build.md) — Phase 1 built, flattened, renamed Kyntra Life; pushed to GitHub; brand/PWA pushed; index-free queries pushed; user to confirm Reminders load; Firestore rules still to publish

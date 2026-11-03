@@ -9,7 +9,7 @@
  * Private data is never cached here: Firestore traffic is cross-origin and bypassed,
  * and HTML documents are not cached (only the static offline page).
  */
-const VERSION = "kyntra-v2";
+const VERSION = "kyntra-v3";
 const STATIC_CACHE = `${VERSION}-static`;
 const PRECACHE = [
   "/offline.html",
@@ -82,6 +82,10 @@ self.addEventListener("push", (event) => {
         tag: d.tag || undefined,
         icon: "/icons/icon-192.png",
         badge: "/icons/icon-96.png",
+        // Sound is the OS default notification sound (web apps cannot set a custom one);
+        // silent:false asks for it explicitly and vibrate adds a haptic cue on Android.
+        silent: false,
+        vibrate: [200, 100, 200],
         data: { url: safePath(d.url) },
       });
     }),

@@ -84,3 +84,12 @@ lint, typecheck, prettier, build, functions build, 40 unit tests, 4 Playwright t
 - User must publish indexes: `npx firebase login` then `npx firebase deploy --only firestore:indexes` (or click console link). CLI not logged in here; nothing deployed by me.
 - Uncommitted/unpushed: top bar/theme toggle, light default, mobile row fixes, PWA name, error-notice change.
 - Still open: publish Firestore rules, Vercel env + authorized domain, Flaticon SVGs, VAPID key, Blaze + functions deploy, README placeholders.
+
+## Follow-ups (CI explained, index dependency removed)
+- Explained the `emulator-tests` CI job (second job in `.github/workflows/ci.yml`): rules tests + Playwright on emulators. Checked earlier CI logs via `gh`: it passed (11/11 rules tests, 4/4 E2E), so rules tests HAVE been verified in CI (earlier "unrun" note is outdated). Optional: bump setup-java to v5 / quiet Node 20 deprecation warnings.
+- Reminders tab showed the new index error (failed-precondition) because indexes were never deployed. Fix: `use-reminders.ts` and `use-tasks.ts` now filter by one field and sort client-side (no composite indexes needed); `firestore.indexes.json` reduced to the collection-group `reminders` index used by the Cloud Function; ARCHITECTURE.md updated. Trade-off: lists capped at 500 unsorted-by-db.
+- Pushed commits `caea103` (mobile top bar etc.) and `11869a4` (index removal) to main.
+
+## Left
+- User to confirm Reminders/Completed views load in browser; if not, send console "Firestore query failed" code (permission-denied = rules not published).
+- Still open: publish Firestore rules (and the one collection-group index with functions), Vercel env + authorized domain, Flaticon SVGs, VAPID key, Blaze + functions deploy, README placeholders.
